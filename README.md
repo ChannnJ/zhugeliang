@@ -2,7 +2,7 @@
 
 通用人工智能创新实践课的组队登记仓库：各队以 PR 向 [teams.md](teams.md) 追加一行，即第 2 讲的作业。
 
-- 仓库地址：GitHub【待定】 · Gitee【待定】，任选其一
+- 仓库地址：[GitHub](https://github.com/cqcai-b010303-2026/teams) · [Gitee](https://gitee.com/cqcai-b010303-2026/teams)，任选其一
 - 截止：第 6 周结束前
 
 ## 前提
