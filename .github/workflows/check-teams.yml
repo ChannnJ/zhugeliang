@@ -1,16 +1,39 @@
 name: check-teams
 
 on:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
     paths: [teams.md]
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # Keep the trusted checker from the base repository. Read only the PR's
+      # merged Markdown blob; never check out or execute code from the PR.
+      - name: Read teams.md from the PR merge commit
+        if: github.event_name == 'pull_request_target'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --no-tags --depth=2 origin "refs/pull/$PR_NUMBER/merge"
+          if [ "$(git rev-parse FETCH_HEAD^1)" != "$PR_BASE_SHA" ] || \
+             [ "$(git rev-parse FETCH_HEAD^2)" != "$PR_HEAD_SHA" ]; then
+            echo "PR merge commit is stale; update the PR branch and try again."
+            exit 1
+          fi
+          git cat-file blob FETCH_HEAD:teams.md > teams.md
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
